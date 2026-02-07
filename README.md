@@ -24,6 +24,7 @@ This project is now static and GitHub Pages compatible:
 - Root entry file: `index.html`
 - Image list source: `image-manifest.json`
 - Jekyll disabled via `.nojekyll`
+- Auto manifest updates via GitHub Actions workflow: `.github/workflows/update-image-manifest.yml`
 
 Set GitHub Pages to deploy from the repository root on your chosen branch.
 
@@ -31,3 +32,8 @@ Set GitHub Pages to deploy from the repository root on your chosen branch.
 
 - `assets/Art/RealArt` (or fallback: `assets/RealArt`)
 - `assets/Art/AiArtData` (or fallback: `assets/AiArtData`)
+
+## Regenerating the manifest
+
+- Local: `npm run build:manifest`
+- CI: runs automatically on push when files in `assets/**` change
