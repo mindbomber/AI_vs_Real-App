@@ -1,0 +1,13 @@
+{
+  "name": "ai-vs-real-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive quiz to guess whether art is AI-generated or human-made.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

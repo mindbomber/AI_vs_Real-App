@@ -1,0 +1,128 @@
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --text: #1e232b;
+  --muted: #556070;
+  --accent: #0f766e;
+  --correct: #16a34a;
+  --incorrect: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top right, #d7eef4, transparent 42%),
+    radial-gradient(circle at top left, #e8f5df, transparent 34%), var(--bg);
+  min-height: 100vh;
+}
+
+.app {
+  width: min(92vw, 900px);
+  margin: 2rem auto;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+}
+
+.subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(26, 31, 41, 0.12);
+}
+
+.image-wrap {
+  width: 100%;
+  height: min(65vh, 560px);
+  background: #f0f2f5;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#quiz-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.result {
+  min-height: 3rem;
+  margin: 1rem 0 0.4rem;
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.result.correct {
+  color: var(--correct);
+}
+
+.result.incorrect {
+  color: var(--incorrect);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.guess-btn {
+  min-width: 140px;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+
+.guess-btn:hover {
+  filter: brightness(1.06);
+}
+
+.guess-btn:active {
+  transform: translateY(1px);
+}
+
+.guess-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.score {
+  margin: 1rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .app {
+    margin: 1rem auto;
+  }
+
+  .image-wrap {
+    height: 52vh;
+  }
+}
