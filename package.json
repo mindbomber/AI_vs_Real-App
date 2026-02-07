@@ -5,7 +5,8 @@
   "description": "Interactive quiz to guess whether art is AI-generated or human-made.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build:manifest": "node scripts/generate-manifest.js"
   },
   "engines": {
     "node": ">=18"

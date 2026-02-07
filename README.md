@@ -2,7 +2,7 @@
 
 Interactive app where users guess whether an artwork is human-made or AI-generated.
 
-## Run
+## Local run
 
 1. Open a terminal in this folder.
 2. Start the app:
@@ -17,7 +17,17 @@ npm start
 http://127.0.0.1:3000
 ```
 
-## Dataset folders used
+## GitHub Pages
+
+This project is now static and GitHub Pages compatible:
+
+- Root entry file: `index.html`
+- Image list source: `image-manifest.json`
+- Jekyll disabled via `.nojekyll`
+
+Set GitHub Pages to deploy from the repository root on your chosen branch.
+
+## Dataset folders used for manifest generation
 
 - `assets/Art/RealArt` (or fallback: `assets/RealArt`)
 - `assets/Art/AiArtData` (or fallback: `assets/AiArtData`)

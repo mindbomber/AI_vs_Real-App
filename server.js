@@ -6,7 +6,6 @@ const { URL } = require("url");
 const HOST = "127.0.0.1";
 const PORT = Number(process.env.PORT || 3000);
 const ROOT_DIR = __dirname;
-const ASSETS_DIR = path.join(ROOT_DIR, "assets");
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -23,88 +22,14 @@ const MIME_TYPES = {
   ".avif": "image/avif"
 };
 
-const IMAGE_EXTENSIONS = new Set([
-  ".png",
-  ".jpg",
-  ".jpeg",
-  ".gif",
-  ".webp",
-  ".bmp",
-  ".svg",
-  ".avif"
-]);
+function getSafePath(pathname) {
+  const decodedPath = decodeURIComponent(pathname);
+  const requestPath = decodedPath === "/" ? "/index.html" : decodedPath;
+  const absolutePath = path.resolve(ROOT_DIR, `.${requestPath}`);
+  const inRoot =
+    absolutePath === ROOT_DIR || absolutePath.startsWith(`${ROOT_DIR}${path.sep}`);
 
-function pickFirstExistingDirectory(candidates) {
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-      return candidate;
-    }
-  }
-  return null;
-}
-
-function toUrlPath(absolutePath) {
-  const relativePath = path.relative(ROOT_DIR, absolutePath);
-  const urlPath = relativePath
-    .split(path.sep)
-    .map((segment) => encodeURIComponent(segment))
-    .join("/");
-
-  return `/${urlPath}`;
-}
-
-function listImageUrls(directoryPath) {
-  const entries = fs.readdirSync(directoryPath, { withFileTypes: true });
-  const files = entries.filter((entry) => entry.isFile());
-
-  return files
-    .filter((file) => IMAGE_EXTENSIONS.has(path.extname(file.name).toLowerCase()))
-    .map((file) => path.join(directoryPath, file.name))
-    .map(toUrlPath);
-}
-
-function randomFrom(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
-
-const realDirectory = pickFirstExistingDirectory([
-  path.join(ASSETS_DIR, "Art", "RealArt"),
-  path.join(ASSETS_DIR, "RealArt")
-]);
-
-const aiDirectory = pickFirstExistingDirectory([
-  path.join(ASSETS_DIR, "Art", "AiArtData"),
-  path.join(ASSETS_DIR, "AiArtData")
-]);
-
-if (!realDirectory || !aiDirectory) {
-  console.error("Could not find the required image folders:");
-  console.error("- assets/Art/RealArt (or assets/RealArt)");
-  console.error("- assets/Art/AiArtData (or assets/AiArtData)");
-  process.exit(1);
-}
-
-const realImages = listImageUrls(realDirectory);
-const aiImages = listImageUrls(aiDirectory);
-
-if (!realImages.length || !aiImages.length) {
-  console.error("One or both image folders do not contain supported image files.");
-  process.exit(1);
-}
-
-function chooseNextImage() {
-  const source = Math.random() < 0.5 ? "human" : "ai";
-  const imageUrl = source === "human" ? randomFrom(realImages) : randomFrom(aiImages);
-
-  return {
-    imageUrl,
-    source
-  };
-}
-
-function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, { "Content-Type": MIME_TYPES[".json"] });
-  response.end(JSON.stringify(payload));
+  return inRoot ? absolutePath : null;
 }
 
 function sendFile(response, filePath) {
@@ -129,45 +54,25 @@ function sendFile(response, filePath) {
   });
 }
 
-function resolveSafePath(pathname) {
-  const decodedPath = decodeURIComponent(pathname);
-  const joinedPath = path.join(ROOT_DIR, decodedPath);
-  const normalizedPath = path.normalize(joinedPath);
-
-  if (!normalizedPath.startsWith(ROOT_DIR)) {
-    return null;
-  }
-
-  return normalizedPath;
-}
-
 const server = http.createServer((request, response) => {
-  const requestUrl = new URL(request.url, `http://${request.headers.host || HOST}`);
-  const { pathname } = requestUrl;
-
-  if (request.method === "GET" && pathname === "/api/next-image") {
-    sendJson(response, 200, chooseNextImage());
-    return;
-  }
-
   if (request.method !== "GET") {
-    sendJson(response, 405, { error: "Method not allowed" });
+    response.writeHead(405, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Method not allowed");
     return;
   }
 
-  const routePath = pathname === "/" ? "/public/index.html" : pathname;
-  const resolvedPath = resolveSafePath(routePath);
+  const requestUrl = new URL(request.url, `http://${request.headers.host || HOST}`);
+  const safePath = getSafePath(requestUrl.pathname);
 
-  if (!resolvedPath) {
-    sendJson(response, 403, { error: "Forbidden" });
+  if (!safePath) {
+    response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Forbidden");
     return;
   }
 
-  sendFile(response, resolvedPath);
+  sendFile(response, safePath);
 });
 
 server.listen(PORT, HOST, () => {
   console.log(`AI vs Real app running at http://${HOST}:${PORT}`);
-  console.log(`Human images loaded: ${realImages.length}`);
-  console.log(`AI images loaded: ${aiImages.length}`);
 });
